@@ -11,14 +11,12 @@ const createDetector = () => {
     return detector;
 }
 
-const detectResult = (img, detector) => {
+const detectResult = (img, dst, detector) => {
     // console.log("Img", img.size());
     const width = img.size().width;
     const height = img.size().height;
 
-    let dst = new cv.Mat(width, height, cv.CV_8UC4);
     let gray = new cv.Mat();
-
 
     // DrawDetectedMarkers on 3CH
     cv.cvtColor(img, dst, cv.COLOR_RGBA2RGB, 0);
@@ -55,7 +53,7 @@ const detectResult = (img, detector) => {
         // Draw Lines if 3 markers detected
         if (centers.length >= 3) {
             let angle = calculate2DAngle(centers);
-            console.log("----", angle , "Degs ----");
+            // console.log("----", angle , "Degs ----");
 
             let id0_center = centers[0];
             let id1_center = centers[1];
@@ -63,12 +61,15 @@ const detectResult = (img, detector) => {
             // Draw Line from Center 0->1 1->2
             cv.line(dst, new cv.Point(id0_center[0], id0_center[1]), new cv.Point(id1_center[0], id1_center[1]), new cv.Scalar(0, 0, 255, 255), 3);
             cv.line(dst, new cv.Point(id1_center[0], id1_center[1]), new cv.Point(id2_center[0], id2_center[1]), new cv.Scalar(0, 255, 0, 255), 3);
+            // Release memory
+            corners_matvec.delete();
+            id_mat.delete();
+            gray.delete();
             return {
                 "marker0": centers[0],
                 "marker1": centers[1],
                 "marker2": centers[2],
-                "angle": angle,
-                "image": dst
+                "angle": angle
             };
         }
     }
@@ -76,15 +77,13 @@ const detectResult = (img, detector) => {
     // Release memory
     corners_matvec.delete();
     id_mat.delete();
-    dst.delete();
     gray.delete();
 
     return {
         "marker0": null,
         "marker1": null,
         "marker2": null,
-        "angle": null,
-        "image": dst
+        "angle": null
     };
 };
 
