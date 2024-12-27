@@ -52,7 +52,10 @@ const detectResult = (img, dst, detector) => {
         }
         // Draw Lines if 3 markers detected
         if (centers.length >= 3) {
+            // Calculate Angle between those arms
             let angle = calculate2DAngle(centers);
+            // Round down to 2 decimal places
+            angle = Math.round(angle * 100) / 100;
             // console.log("----", angle , "Degs ----");
 
             let id0_center = centers[0];
